@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Categories</title>
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+  <label for="geography">Geography:</label>
+  <select id="geography">
+    <option value="">All</option>
+  </select>
+  <label for="platform">Platform:</label>
+  <select id="platform">
+    <option value="">All</option>
+  </select>
+  <label for="category">Category:</label>
+  <select id="category">
+    <option value="">All</option>
+  </select>
+
+  <table id="categories-table">
+    <thead>
+      <tr>
+        <th>Username</th>
+        <th>Category</th>
+        <th>Subscribers</th>
+        <th>Geography</th>
+        <th>Platform</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Data will be populated here dynamically -->
+    </tbody>
+  </table>
+
+  <script>
+    // Populate combo boxes with options
+    fetch('http://localhost:3000/api/Categories/List/geographyList')
+      .then(response => response.json())
+      .then(data => {
+        const geographySelect = document.getElementById('geography');
+        data.geographies.forEach(geo => {
+          const option = document.createElement('option');
+          option.value = geo;
+          option.textContent = geo;
+          geographySelect.appendChild(option);
+        });
+      });
+
+    fetch('http://localhost:3000/api/Categories/List/platformList')
+      .then(response => response.json())
+      .then(data => {
+        const platformSelect = document.getElementById('platform');
+        data.platform.forEach(plat => {
+          const option = document.createElement('option');
+          option.value = plat;
+          option.textContent = plat;
+          platformSelect.appendChild(option);
+        });
+      });
+
+    fetch('http://localhost:3000/api/Categories/List/categoriesList')
+      .then(response => response.json())
+      .then(data => {
+        const categorySelect = document.getElementById('category');
+        data.categories.forEach(cat => {
+          const option = document.createElement('option');
+          option.value = cat;
+          option.textContent = cat;
+          categorySelect.appendChild(option);
+        });
+      });
+
+    // Fetch data from the endpoint and populate table
+    function populateTable() {
+      fetch('http://localhost:3000/api/Categories/getCategories')
+        .then(response => response.json())
+        .then(data => {
+          const categoriesTable = document.getElementById('categories-table');
+          const tbody = categoriesTable.getElementsByTagName('tbody')[0];
+          tbody.innerHTML = '';
+
+          data.categories.forEach(category => {
+            const row = tbody.insertRow();
+            row.insertCell().textContent = category.username;
+            row.insertCell().textContent = category.name;
+            row.insertCell().textContent = category.subscribers;
+            row.insertCell().textContent = category.geography;
+            row.insertCell().textContent = category.platform;
+          });
+        })
+        .catch(error => console.error('Error fetching data:', error));
+    }
+
+    populateTable(); // Populate table initially
+
+    // Add event listeners to combo boxes for filtering
+    document.getElementById('geography').addEventListener('change', function() {
+      const selectedValue = this.value;
+      if (selectedValue) {
+        fetch(`http://localhost:3000/api/Categories/Filter/geographySort?geography=${selectedValue}`)
+          .then(response => response.json())
+          .then(data => {
+            const categoriesTable = document.getElementById('categories-table');
+            const tbody = categoriesTable.getElementsByTagName('tbody')[0];
+            tbody.innerHTML = '';
+
+            data.categories.forEach(category => {
+              const row = tbody.insertRow();
+              row.insertCell().textContent = category.username;
+              row.insertCell().textContent = category.name;
+              row.insertCell().textContent = category.subscribers;
+              row.insertCell().textContent = category.geography;
+              row.insertCell().textContent = category.platform;
+            });
+          })
+          .catch(error => console.error('Error fetching filtered data:', error));
+      } else {
+        populateTable();
+      }
+    });
+
+    document.getElementById('platform').addEventListener('change', function() {
+      const selectedValue = this.value;
+      if (selectedValue) {
+        fetch(`http://localhost:3000/api/Categories/Filter/platformSort?platform=${selectedValue}`)
+          .then(response => response.json())
+          .then(data => {
+            const categoriesTable = document.getElementById('categories-table');
+            const tbody = categoriesTable.getElementsByTagName('tbody')[0];
+            tbody.innerHTML = '';
+
+            data.categories.forEach(category => {
+              const row = tbody.insertRow();
+              row.insertCell().textContent = category.username;
+              row.insertCell().textContent = category.name;
+              row.insertCell().textContent = category.subscribers;
+              row.insertCell().textContent = category.geography;
+              row.insertCell().textContent = category.platform;
+            });
+          })
+          .catch(error => console.error('Error fetching filtered data:', error));
+      } else {
+        populateTable();
+      }
+    });
+
+    document.getElementById('category').addEventListener('change', function() {
+      const selectedValue = this.value;
+      if (selectedValue) {
+        fetch(`http://localhost:3000/api/Categories/Filter/categoriesSort?name=${selectedValue}`)
+          .then(response => response.json())
+          .then(data => {
+            const categoriesTable = document.getElementById('categories-table');
+            const tbody = categoriesTable.getElementsByTagName('tbody')[0];
+            tbody.innerHTML = '';
+
+            data.categories.forEach(category => {
+              const row = tbody.insertRow();
+              row.insertCell().textContent = category.username;
+              row.insertCell().textContent = category.name;
+              row.insertCell().textContent = category.subscribers;
+              row.insertCell().textContent = category.geography;
+              row.insertCell().textContent = category.platform;
+            });
+          })
+          .catch(error => console.error('Error fetching filtered data:', error));
+      } else {
+        populateTable();
+      }
+    });
+  </script>
+</body>
+</html>
